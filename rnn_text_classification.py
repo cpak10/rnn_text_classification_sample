@@ -55,7 +55,7 @@ if __name__ == '__main__':
     x = df_tweets['Text']
     y = df_tweets['CB_Label']
 
-    x_filt = x.apply(remove_stop_words)
+    # x_filt = x.apply(remove_stop_words)
 
     N_FOLDS = 5
     kf = KFold(n_splits=N_FOLDS, shuffle=True)
@@ -63,9 +63,9 @@ if __name__ == '__main__':
     lst_cv_acc = []
     lst_cv_loss = []
 
-    for i, (train_ind, test_ind) in enumerate(kf.split(x_filt)):
+    for i, (train_ind, test_ind) in enumerate(kf.split(x)):
 
-        x_train, x_test = x_filt[train_ind], x_filt[test_ind]
+        x_train, x_test = x[train_ind], x[test_ind]
         y_train, y_test = y[train_ind], y[test_ind]
 
         encoder = tf.keras.layers.TextVectorization()
@@ -87,14 +87,14 @@ if __name__ == '__main__':
                 optimizer=tf.keras.optimizers.legacy.Adam(1e-4),
                 metrics=['accuracy'])
 
-        history = model.fit(x=x_train, y=y_train, epochs=10,
+        history = model.fit(x=x_train, y=y_train, epochs=25, batch_size=32,
                         validation_split=.2)
 
         test_loss, test_acc = model.evaluate(x=x_test, y=y_test)
         lst_cv_acc.append(test_acc)
         lst_cv_loss.append(test_loss)
 
-        print('K-fold:', i)
+        print('K-fold:', i+1)
         print('Test Loss:', test_loss)
         print('Test Accuracy:', test_acc)
 
